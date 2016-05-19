@@ -38,7 +38,51 @@ def decrypt_ciphertext(y):
 
 def multiply(k, A):
     #TODO: For Nuno
-    return (0 ,0)
+    #supposedly
+    res = A
+    for x in range (0, k) :
+        res = point_add(res, A)
+
+    return res
+
+def egcd(a, b):
+    prevx, x = 1, 0;
+    prevy, y = 0, 1
+    while b:
+        q = a // b
+        x, prevx = prevx - q * x, x
+        y, prevy = prevy - q * y, y
+        a, b = b, a % b
+    return a, prevx, prevy
+
+
+def modinv(a, m):
+    g, x, y = egcd(a, m)
+    if g != 1:
+        raise Exception('modular inverse does not exist')
+    else:
+        return x % m
+
+
+def point_add(x,y) :
+    if(x[0] == y[0]) :
+        if(x[1] == y[1]) :
+            slope = ((3 * (pow(x[0],2)) + a) % p) * modinv((2*x[1]), p)
+            slope = slope % p
+        else :
+            raise Exception('Point at infinity')
+    else :
+        slope = ((y[1] - x[1]) % p) * modinv((y[0] - x[0]), p)
+        slope = slope % p
+    x3 = ((pow(slope,2)) - x[0] - y[0]) % p
+    y3 = (slope * (x[0] - x3) - x[1]) % p
+
+    return (x3, y3)
+
+
+
+
+
 
 #Define cryptosystem: K = {(E, P, m, Q, n): Q = mP}
 global a, b, p      #E function: f(x) = x^3 + a*x + b (mod p)
