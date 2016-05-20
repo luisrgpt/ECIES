@@ -7,40 +7,40 @@ def z_is_a_quadratic_non_residue_modulo_p(z, p):
     x_is_a_quadratic_non_residue = isinstance(x, int)
     return x_is_a_quadratic_non_residue
 
-def point_decompress(x, i):
+def point_decompress(x):
     #As described on Algorithm 6.4, page 263
-    z = (x^3 + a*x + b) % p
+    z = (pow(x[0],3) + a*x[0] + b) % p
     if z_is_a_quadratic_non_residue_modulo_p(z, p):
         return "failure"
-    else
-        y = math.sqrt(z) % p
-        if y == i % 2:
-            return (x, y)
+    else :
+        y = int(math.sqrt(z)) % p
+        if y % 2 == x[1] % 2:
+            return (x[0], y)
         else:
-            return (x, P - y)
+            return (x[0], p - y)
 
-def point_compress(x, y):
-    return (x, y % 2)
+def point_compress(x):
+    return (x[0], x[1] % 2)
 
 def encrypt_plaintext(x, k):
     kP = multiply(k, P)
     kQ = multiply(k, Q)
     x0 = kQ[0]
-    return point_compress(kP, (x*x0) % p)
+    return (point_compress(kP), (x*x0) % p)
 
 def decrypt_ciphertext(y):
     y1 = y[0]
     y2 = y[1]
     decompressed_point = multiply(m, point_decompress(y1))
     x0 = decompressed_point[0]
-    return (y2/x0) % p
+    return (y2*modinv(x0, p)) % p
 
 
 def multiply(k, A):
     #TODO: For Nuno
     #supposedly
     res = A
-    for x in range (0, k) :
+    for x in range (0, k-1) :
         res = point_add(res, A)
 
     return res
